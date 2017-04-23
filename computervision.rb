@@ -27,12 +27,13 @@ class ComputerVision
   
   def api(url) # { url: "https://pbs.twimg.com/..." }
     # Request body
-    hash = { url: url }
+    hash = { url: url.to_s }
     @request.body = JSON.generate(hash) # '{"url":"https://pbs.twimg.com/..."}'
     # @request.body = '{"url":"'+ url  +'"}'
-    @response = Net::HTTP.start(@uri.host, @uri.port, :use_ssl => @uri.scheme == 'https') do |http|
+    @response = Net::HTTP.start(@uri.host, @uri.port,
+                                :use_ssl => @uri.scheme == 'https') {|http|
       http.request(@request)
-    end
+    }
     return JSON.parse(@response.body)
   end
   
