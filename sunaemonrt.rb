@@ -37,7 +37,7 @@ class SunaemonRT
   def check()
     retweets = @client.retweeted_by_user("sunaemonRT")
     retweets.each{|tweet|
-      if tweet.created_at < Time.now - 2.day
+      if tweet.created_at.in_time_zone('Tokyo') < Time.now - 2.day
         next
       end
       str = SunaemonRT.daystr(tweet.created_at)
@@ -53,11 +53,13 @@ class SunaemonRT
         if md.class == Twitter::Media::Photo
           url = md.media_uri.to_s
           begin
-            sleep(1)
+            sleep(5)
             hash = @cv.api(url)
             puts "url = #{url}"
             p hash
-            ary << Result.new(hash, false, tweet.created_at, tweet.id, url)
+            ary << Result.new(hash, false,
+                              tweet.created_at.in_time_zone('Tokyo'),
+                              tweet.id, url)
           rescue => e
             puts e
             ok = false
@@ -89,7 +91,7 @@ class SunaemonRT
         if ok
           puts "retweet: #{id}"
           begin
-            sleep(1)
+            sleep(5)
             @client.retweet(id)
           rescue => e
             puts e
@@ -188,7 +190,7 @@ class SunaemonRT
       followers.each{|id|
         if !@client.friendship?("sunaemonRT_univ", id)
           @client.follow(id)
-          sleep(1)
+          sleep(5)
         end
       }
     rescue => e
@@ -197,7 +199,7 @@ class SunaemonRT
   end
 
   def SunaemonRT.daystr(time)
-    time.strftime("%Y%m%d")
+    time.in_time_zone('Tokyo').strftime("%Y%m%d")
   end
   
 end

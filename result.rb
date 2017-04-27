@@ -1,6 +1,7 @@
 class Result
   require 'twitter'
   require 'time'
+  require 'active_support/all'
   attr_accessor :hash, :retweeted, :time, :id, :url
 
   def initialize(hash, retweeted, time, id, url)
@@ -12,7 +13,7 @@ class Result
       @hash = nil
     end
     @retweeted = retweeted
-    @time = time
+    @time = time.in_time_zone("Tokyo")
     @id = id.to_i
     @url = url.to_s
   end
@@ -21,7 +22,7 @@ class Result
     ans = {}
     ans[:hash] = @hash
     ans[:retweeted] = @retweeted
-    ans[:time] = @time.to_s
+    ans[:time] = @time.in_time_zone("Tokyo").to_s
     ans[:id] = @id.to_i
     ans[:url] = @url.to_s
     return ans.to_s
@@ -34,7 +35,7 @@ class Result
     end
     return Result.new(h,
                       from[:retweeted],
-                      Time.parse(from[:time]),
+                      Time.parse(from[:time]).in_time_zone("Tokyo"),
                       from[:id].to_i,
                       from[:url].to_s)
   end
