@@ -7,10 +7,11 @@ class SunaemonRT
   load './result.rb'
   load './computervision.rb'
 
-  attr_accessor :client, :dic, :cv
+  attr_accessor :client, :dic, :cv, :account
   # dic["20170420"][(int tweet id)] = [result, result2, \dots ]
+  # account = "sunaemonRT"
 
-  def initialize()
+  def initialize(account)
     @client = Twitter::REST::Client.new {|config|
       config.consumer_key = load_key("twitter-consumer-key.txt")
       config.consumer_secret = load_key("twitter-consumer-secret.txt")
@@ -19,6 +20,7 @@ class SunaemonRT
     }
     read_dic()
     @cv = ComputerVision.new()
+    @account = account.to_s
   end
 
   def work()
@@ -35,7 +37,7 @@ class SunaemonRT
   end
 
   def check()
-    retweets = @client.retweeted_by_user("sunaemonRT")
+    retweets = @client.retweeted_by_user(@account)
     retweets.each{|tweet|
       if tweet.created_at.in_time_zone('Tokyo') < Time.now - 2.day
         next
@@ -122,7 +124,7 @@ class SunaemonRT
           break
         elsif level < 1 && res.racy?
           level = 1
-        end 
+        end
       }
       if ok
         if level == 2
@@ -135,7 +137,7 @@ class SunaemonRT
       end
     }
     sum = adult + racy + app
-    text = "#{time.strftime("%Y 年 %m 月 %d 日")}の @sunaemonRT のリツイートのうち #{sum} 件を判定しました。\n健全: #{app} 件\nきわどい: #{racy} 件\n18 禁: #{adult} 件"
+    text = "#{time.strftime("%Y 年 %m 月 %d 日")}の @#{@account} のリツイートのうち #{sum} 件を判定しました。\n健全: #{app} 件\nきわどい: #{racy} 件\n18 禁: #{adult} 件"
     @client.update(text)
   end
 
@@ -144,14 +146,14 @@ class SunaemonRT
     now = Time.now
     for i in 0..3
       str = SunaemonRT.daystr(now - i.days)
-      path = File.expand_path("../dic/#{str}.txt", __FILE__)
+      path = File.expand_path("../dic/#{@account}/#{str}.txt", __FILE__)
       if FileTest.exist?(path)
         open(path) {|input|
           @dic[str] = eval(input.read.to_s)
         }
         @dic[str].each{|id, val|
           @dic[str][id].map!{|res|
-            Result.hash_to_result(eval(res))           
+            Result.hash_to_result(eval(res))
           }
         }
       else
@@ -169,7 +171,7 @@ class SunaemonRT
           nids[id] << res.to_s
         }
       }
-      path = File.expand_path("../dic/#{str}.txt", __FILE__)
+      path = File.expand_path("../dic/#{@account}/#{str}.txt", __FILE__)
       open(path, 'w') {|output|
         output.write(nids.to_s)
       }
@@ -201,5 +203,5 @@ class SunaemonRT
   def SunaemonRT.daystr(time)
     time.in_time_zone('Tokyo').strftime("%Y%m%d")
   end
-  
+
 end
