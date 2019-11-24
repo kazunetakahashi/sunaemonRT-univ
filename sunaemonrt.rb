@@ -139,6 +139,7 @@ class SunaemonRT
     sum = adult + racy + app
     text = "#{time.strftime("%Y 年 %m 月 %d 日")}の @#{@account} のリツイートのうち #{sum} 件を判定しました。\n健全: #{app} 件\nきわどい: #{racy} 件\n18 禁: #{adult} 件"
     @client.update(text)
+    sleep(5)
   end
 
   def read_dic()

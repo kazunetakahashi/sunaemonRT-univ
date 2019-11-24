@@ -17,5 +17,5 @@ every(1.hour, 'follow_return') {
 
 every(1.day, 'report', :at => '00:05') {
   @sunaemon.report()
-  @me.work()
+  @me.report()
 }
