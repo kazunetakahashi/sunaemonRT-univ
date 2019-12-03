@@ -156,6 +156,16 @@ class SunaemonRT
           @dic[str][id].map!{|res|
             Result.hash_to_result(eval(res))
           }
+          has_nil = false
+          @dic[str][id].each{|res|
+            if res.nil?
+              has_nil = true
+              break
+            end
+          }
+          if has_nil
+            @dic[str].delete(id)
+          end
         }
       else
         @dic[str] = {}

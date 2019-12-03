@@ -31,7 +31,7 @@ class Result
   def Result.hash_to_result(from)
     h = from[:hash]
     if h == ""
-      h = nil
+      return nil
     end
     return Result.new(h,
                       from[:retweeted],
@@ -62,7 +62,7 @@ class Result
   def racy?()
     return is_picture?() &&
            !@hash["adult"]["isAdultContent"] &&
-           @hash["adult"]["isRacyContent"]   
+           @hash["adult"]["isRacyContent"]
   end
-  
+
 end
