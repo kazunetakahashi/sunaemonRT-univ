@@ -30,7 +30,7 @@ class Result
 
   def Result.hash_to_result(from)
     h = from[:hash]
-    if h == ""
+    if h.nil? || h == ""
       return nil
     end
     return Result.new(h,
